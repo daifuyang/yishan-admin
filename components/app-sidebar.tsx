@@ -153,18 +153,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="border-b">
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* <SidebarMenuButton
+                        <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-14 w-full justify-start px-4 data-[state=collapsed=icon]:justify-center data-[state=collapsed=icon]:px-2"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <GalleryVerticalEnd className="size-4" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="font-medium">移山通用管理系统</span>
+              <div className="grid flex-1 text-left text-sm leading-tight whitespace-nowrap">
+                <span className="truncate font-medium">移山通用管理系统</span>
                 <span className="text-xs text-muted-foreground">锲而不舍，金石可镂</span>
               </div>
-            </SidebarMenuButton> */}
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
