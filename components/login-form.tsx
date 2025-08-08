@@ -18,9 +18,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">欢迎回来</CardTitle>
+          <CardTitle className="text-xl">管理员登录</CardTitle>
           <CardDescription>
-            请输入您的账号和密码
+            锲而不舍，金石可镂
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -40,7 +40,7 @@ export function LoginForm({
                   <div className="flex items-center">
                     <Label htmlFor="password">密码</Label>
                   </div>
-                  <Input id="password" type="password" required />
+                  <Input id="password" type="password" placeholder="请输入密码" required />
                 </div>
                 <Button type="submit" className="w-full">
                   登录

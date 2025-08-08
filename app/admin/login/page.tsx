@@ -10,7 +10,7 @@ export default function AdminLoginPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          管理后台
+          <span className="text-lg font-semibold">移山通用管理系统</span>
         </a>
         <LoginForm />
       </div>
