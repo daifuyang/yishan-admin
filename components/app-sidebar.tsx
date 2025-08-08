@@ -18,6 +18,10 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 // This is sample data.
@@ -146,16 +150,23 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="border-b p-4">
-        <div className="flex items-center gap-2 px-2">
-          <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md">
-            <GalleryVerticalEnd className="size-5" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-lg font-semibold leading-none">移山通用管理系统</h1>
-            <p className="text-xs text-muted-foreground">锲而不舍，金石可镂</p>
-          </div>
-        </div>
+      <SidebarHeader className="border-b">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            {/* <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground h-14 w-full justify-start px-4 data-[state=collapsed=icon]:justify-center data-[state=collapsed=icon]:px-2"
+            >
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <GalleryVerticalEnd className="size-4" />
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="font-medium">移山通用管理系统</span>
+                <span className="text-xs text-muted-foreground">锲而不舍，金石可镂</span>
+              </div>
+            </SidebarMenuButton> */}
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
