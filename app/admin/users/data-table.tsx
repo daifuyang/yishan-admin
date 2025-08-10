@@ -21,11 +21,13 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  action?: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  action,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -63,14 +65,25 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const columnDef = cell.column.columnDef as any;
+                    return (
+                      <TableCell key={cell.id}>
+                        {columnDef.render ? 
+                          columnDef.render(
+                            cell.getValue(),
+                            row.original,
+                            row.index,
+                            action
+                          ) :
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
+                        }
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

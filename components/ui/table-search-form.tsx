@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -113,6 +113,8 @@ interface TableSearchFormProps {
   className?: string
   loading?: boolean
   layout?: 'horizontal' | 'vertical' // 布局方向
+  showSearchCount?: boolean // 是否显示搜索结果数量
+  searchCount?: number // 搜索结果数量
 }
 
 export default function TableSearchForm({
@@ -133,6 +135,8 @@ export default function TableSearchForm({
   className,
   loading = false,
   layout = 'horizontal',
+  showSearchCount = false,
+  searchCount = 0,
 }: TableSearchFormProps) {
   // 使用受控或非受控模式
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed)
@@ -341,21 +345,73 @@ export default function TableSearchForm({
   }, [])
 
   const handleSubmit = (data: FormData) => {
-    // 过滤空值
-    const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
-      if (value && value.toString().trim() !== '') {
-        acc[key] = value
-      }
-      return acc
-    }, {} as Record<string, any>)
-    
-    onSearch(filteredData)
+    try {
+      // 过滤空值和无效值
+      const filteredData = Object.entries(data).reduce((acc, [key, value]) => {
+        // 处理不同类型的值
+        if (value !== null && value !== undefined) {
+          const stringValue = value.toString().trim()
+          // 过滤掉空字符串、"null"、"undefined"等无效值
+          if (stringValue !== '' && stringValue !== 'null' && stringValue !== 'undefined') {
+            // 对于数字类型，尝试转换
+            const field = searchFields.find(f => f.key === key)
+            if (field?.type === 'number' && !isNaN(Number(stringValue))) {
+              acc[key] = Number(stringValue)
+            } else if (field?.type === 'checkbox') {
+              acc[key] = Boolean(value)
+            } else {
+              acc[key] = value
+            }
+          }
+        }
+        return acc
+      }, {} as Record<string, any>)
+      
+      // 调用搜索回调
+      onSearch(filteredData)
+    } catch (error) {
+      console.error('搜索表单提交失败:', error)
+      // 这里可以添加错误提示，比如使用 toast
+    }
   }
 
   const handleReset = () => {
-    form.reset(getDefaultValues())
-    onReset?.()
+    try {
+      // 重置表单到默认值
+      const defaultValues = getDefaultValues()
+      form.reset(defaultValues)
+      
+      // 调用重置回调
+      onReset?.()
+      
+      // 如果是受控折叠模式，重置为默认折叠状态
+      if (controlledCollapsed === undefined && !defaultCollapsed) {
+        setInternalCollapsed(defaultCollapsed)
+      }
+    } catch (error) {
+      console.error('重置表单失败:', error)
+      // 这里可以添加错误提示
+    }
   }
+
+  // 键盘快捷键支持
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ctrl/Cmd + Enter 提交搜索
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault()
+        form.handleSubmit(handleSubmit)()
+      }
+      // Ctrl/Cmd + R 重置表单
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault()
+        handleReset()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [form])
 
   const renderField = (field: SearchField, index: number) => {
     return (
@@ -646,10 +702,11 @@ export default function TableSearchForm({
                 type="submit" 
                 size="sm" 
                 disabled={loading}
-                className="h-9 px-4 text-sm font-medium"
+                className="h-9 px-4 text-sm font-medium cursor-pointer hover:bg-primary/90 hover:shadow-md transition-all duration-200"
+                title="查询 (Ctrl/Cmd + Enter)"
               >
                 <Search className="w-4 h-4 mr-1.5" />
-                查询
+                {loading ? '查询中...' : '查询'}
               </Button>
               <Button 
                 type="button" 
@@ -657,11 +714,19 @@ export default function TableSearchForm({
                 size="sm" 
                 onClick={handleReset}
                 disabled={loading}
-                className="h-9 px-4 text-sm font-medium"
+                className="h-9 px-4 text-sm font-medium cursor-pointer"
+                title="重置 (Ctrl/Cmd + R)"
               >
                 <RotateCcw className="w-4 h-4 mr-1.5" />
                 重置
               </Button>
+              
+              {/* 搜索结果数量显示 */}
+              {showSearchCount && (
+                <span className="text-sm text-gray-500 ml-2">
+                  共找到 {searchCount} 条记录
+                </span>
+              )}
               
               {/* 展开/收起按钮 */}
               {hasMoreFields && (

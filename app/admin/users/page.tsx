@@ -6,26 +6,27 @@ import { Plus } from "lucide-react";
 import { columns, type User, type ProColumnDef } from "./columns";
 import { DataTable } from "./data-table";
 import TableSearchForm, { ProColumnType } from "@/components/ui/table-search-form";
+import { UserFormDialog } from "./user-form-dialog";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [searchParams, setSearchParams] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
+  const [searchParams, setSearchParams] = useState<Record<string, any>>({});
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | undefined>(undefined);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // TableSearchForm 组件现在可以直接处理 ProColumnDef 类型的 columns
-
-  // 过滤数据
+  // 根据搜索参数过滤用户
   const filteredUsers = users.filter((user) => {
     return Object.entries(searchParams).every(([key, value]) => {
-      if (!value || value.toString().trim() === '') return true;
-      
-      const userValue = user[key as keyof typeof user];
+      if (!value) return true;
+      const userValue = user[key as keyof User];
       if (typeof userValue === 'string') {
-        return userValue.toLowerCase().includes(value.toString().toLowerCase());
+        return userValue.toLowerCase().includes(value.toLowerCase());
       }
       return userValue === value;
     });
@@ -34,338 +35,62 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // 模拟API调用 - 30条演示数据
       const mockUsers: User[] = [
         {
           id: "1",
           username: "admin",
-          name: "系统管理员",
+          name: "管理员",
+          email: "admin@example.com",
+          phone: "13800138000",
           department: "技术部",
           role: "超级管理员",
           status: "正常",
-          email: "admin@yishan.com",
-          phone: "13800138000",
-          createTime: "2024-01-01",
+          createTime: "2024-01-01"
         },
         {
           id: "2",
-          username: "zhangsan",
+          username: "user001",
           name: "张三",
-          department: "技术部",
-          role: "开发工程师",
-          status: "正常",
-          email: "zhangsan@yishan.com",
+          email: "zhangsan@example.com",
           phone: "13800138001",
-          createTime: "2024-01-15",
+          department: "产品部",
+          role: "普通用户",
+          status: "正常",
+          createTime: "2024-01-02"
         },
         {
           id: "3",
-          username: "lisi",
+          username: "user002",
           name: "李四",
-          department: "市场部",
-          role: "市场经理",
-          status: "正常",
-          email: "lisi@yishan.com",
+          email: "lisi@example.com",
           phone: "13800138002",
-          createTime: "2024-02-01",
+          department: "运营部",
+          role: "运营专员",
+          status: "禁用",
+          createTime: "2024-01-03"
         },
         {
           id: "4",
-          username: "wangwu",
+          username: "user003",
           name: "王五",
+          email: "wangwu@example.com",
+          phone: "13800138003",
           department: "财务部",
           role: "财务专员",
-          status: "禁用",
-          email: "wangwu@yishan.com",
-          phone: "13800138003",
-          createTime: "2024-02-15",
+          status: "正常",
+          createTime: "2024-01-04"
         },
         {
           id: "5",
-          username: "zhaoliu",
+          username: "user004",
           name: "赵六",
+          email: "zhaoliu@example.com",
+          phone: "13800138004",
           department: "人事部",
           role: "人事专员",
           status: "正常",
-          email: "zhaoliu@yishan.com",
-          phone: "13800138004",
-          createTime: "2024-03-01",
-        },
-        {
-          id: "6",
-          username: "sunqi",
-          name: "孙七",
-          department: "技术部",
-          role: "前端工程师",
-          status: "正常",
-          email: "sunqi@yishan.com",
-          phone: "13800138005",
-          createTime: "2024-03-15",
-        },
-        {
-          id: "7",
-          username: "zhouba",
-          name: "周八",
-          department: "技术部",
-          role: "后端工程师",
-          status: "正常",
-          email: "zhouba@yishan.com",
-          phone: "13800138006",
-          createTime: "2024-04-01",
-        },
-        {
-          id: "8",
-          username: "wujiu",
-          name: "吴九",
-          department: "市场部",
-          role: "销售专员",
-          status: "正常",
-          email: "wujiu@yishan.com",
-          phone: "13800138007",
-          createTime: "2024-04-15",
-        },
-        {
-          id: "9",
-          username: "zhengshi",
-          name: "郑十",
-          department: "财务部",
-          role: "会计",
-          status: "正常",
-          email: "zhengshi@yishan.com",
-          phone: "13800138008",
-          createTime: "2024-05-01",
-        },
-        {
-          id: "10",
-          username: "chenyi",
-          name: "陈一",
-          department: "人事部",
-          role: "招聘专员",
-          status: "正常",
-          email: "chenyi@yishan.com",
-          phone: "13800138009",
-          createTime: "2024-05-15",
-        },
-        {
-          id: "11",
-          username: "liuer",
-          name: "刘二",
-          department: "技术部",
-          role: "测试工程师",
-          status: "正常",
-          email: "liuer@yishan.com",
-          phone: "13800138010",
-          createTime: "2024-06-01",
-        },
-        {
-          id: "12",
-          username: "huangsan",
-          name: "黄三",
-          department: "市场部",
-          role: "市场专员",
-          status: "禁用",
-          email: "huangsan@yishan.com",
-          phone: "13800138011",
-          createTime: "2024-06-15",
-        },
-        {
-          id: "13",
-          username: "linsi",
-          name: "林四",
-          department: "财务部",
-          role: "出纳",
-          status: "正常",
-          email: "linsi@yishan.com",
-          phone: "13800138012",
-          createTime: "2024-07-01",
-        },
-        {
-          id: "14",
-          username: "hewu",
-          name: "何五",
-          department: "人事部",
-          role: "培训专员",
-          status: "正常",
-          email: "hewu@yishan.com",
-          phone: "13800138013",
-          createTime: "2024-07-15",
-        },
-        {
-          id: "15",
-          username: "gaoliu",
-          name: "高六",
-          department: "技术部",
-          role: "架构师",
-          status: "正常",
-          email: "gaoliu@yishan.com",
-          phone: "13800138014",
-          createTime: "2024-08-01",
-        },
-        {
-          id: "16",
-          username: "xuqi",
-          name: "徐七",
-          department: "市场部",
-          role: "品牌经理",
-          status: "正常",
-          email: "xuqi@yishan.com",
-          phone: "13800138015",
-          createTime: "2024-08-15",
-        },
-        {
-          id: "17",
-          username: "songba",
-          name: "宋八",
-          department: "财务部",
-          role: "财务经理",
-          status: "正常",
-          email: "songba@yishan.com",
-          phone: "13800138016",
-          createTime: "2024-09-01",
-        },
-        {
-          id: "18",
-          username: "tangjiu",
-          name: "唐九",
-          department: "人事部",
-          role: "人事经理",
-          status: "正常",
-          email: "tangjiu@yishan.com",
-          phone: "13800138017",
-          createTime: "2024-09-15",
-        },
-        {
-          id: "19",
-          username: "hanshi",
-          name: "韩十",
-          department: "技术部",
-          role: "运维工程师",
-          status: "禁用",
-          email: "hanshi@yishan.com",
-          phone: "13800138018",
-          createTime: "2024-10-01",
-        },
-        {
-          id: "20",
-          username: "dengyi",
-          name: "邓一",
-          department: "市场部",
-          role: "客户经理",
-          status: "正常",
-          email: "dengyi@yishan.com",
-          phone: "13800138019",
-          createTime: "2024-10-15",
-        },
-        {
-          id: "21",
-          username: "caier",
-          name: "蔡二",
-          department: "财务部",
-          role: "审计专员",
-          status: "正常",
-          email: "caier@yishan.com",
-          phone: "13800138020",
-          createTime: "2024-11-01",
-        },
-        {
-          id: "22",
-          username: "fansan",
-          name: "范三",
-          department: "人事部",
-          role: "薪酬专员",
-          status: "正常",
-          email: "fansan@yishan.com",
-          phone: "13800138021",
-          createTime: "2024-11-15",
-        },
-        {
-          id: "23",
-          username: "yansi",
-          name: "严四",
-          department: "技术部",
-          role: "产品经理",
-          status: "正常",
-          email: "yansi@yishan.com",
-          phone: "13800138022",
-          createTime: "2024-12-01",
-        },
-        {
-          id: "24",
-          username: "luwu",
-          name: "陆五",
-          department: "市场部",
-          role: "渠道经理",
-          status: "正常",
-          email: "luwu@yishan.com",
-          phone: "13800138023",
-          createTime: "2024-12-15",
-        },
-        {
-          id: "25",
-          username: "kongliu",
-          name: "孔六",
-          department: "财务部",
-          role: "成本会计",
-          status: "禁用",
-          email: "kongliu@yishan.com",
-          phone: "13800138024",
-          createTime: "2025-01-01",
-        },
-        {
-          id: "26",
-          username: "baiqi",
-          name: "白七",
-          department: "人事部",
-          role: "绩效专员",
-          status: "正常",
-          email: "baiqi@yishan.com",
-          phone: "13800138025",
-          createTime: "2025-01-15",
-        },
-        {
-          id: "27",
-          username: "maoba",
-          name: "毛八",
-          department: "技术部",
-          role: "UI设计师",
-          status: "正常",
-          email: "maoba@yishan.com",
-          phone: "13800138026",
-          createTime: "2025-02-01",
-        },
-        {
-          id: "28",
-          username: "wenjiu",
-          name: "温九",
-          department: "市场部",
-          role: "商务专员",
-          status: "正常",
-          email: "wenjiu@yishan.com",
-          phone: "13800138027",
-          createTime: "2025-02-15",
-        },
-        {
-          id: "29",
-          username: "jiangshi",
-          name: "蒋十",
-          department: "财务部",
-          role: "税务专员",
-          status: "正常",
-          email: "jiangshi@yishan.com",
-          phone: "13800138028",
-          createTime: "2025-03-01",
-        },
-        {
-          id: "30",
-          username: "caiyi",
-          name: "蔡一",
-          department: "人事部",
-          role: "行政助理",
-          status: "正常",
-          email: "caiyi@yishan.com",
-          phone: "13800138029",
-          createTime: "2025-03-15",
-        },
+          createTime: "2024-01-05"
+        }
       ];
 
       setUsers(mockUsers);
@@ -376,15 +101,69 @@ export default function UsersPage() {
     }
   };
 
+  const handleUserFormSuccess = (userData: User, isEdit?: boolean) => {
+    if (isEdit) {
+      // 编辑模式：更新现有用户
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userData.id ? userData : user
+        )
+      );
+    } else {
+      // 添加模式：添加新用户
+      setUsers(prevUsers => [userData, ...prevUsers]);
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  // 计算统计数据
+  const totalUsers = users.length;
+  const activeUsers = users.filter(user => user.status === '正常').length;
+  const disabledUsers = users.filter(user => user.status === '禁用').length;
+  const newUsersThisMonth = users.filter(user => {
+    const createDate = new Date(user.createTime);
+    const now = new Date();
+    return createDate.getMonth() === now.getMonth() && createDate.getFullYear() === now.getFullYear();
+  }).length;
+
   return (
     <div className="pb-6">
       {/* 页面标题区域 */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">用户管理</h1>
-        <Button className="h-9 px-4">
+        <Button className="h-9 px-4" onClick={() => {
+          setDialogMode('add');
+          setEditingUser(undefined);
+          setDialogOpen(true);
+        }}>
           <Plus className="w-4 h-4 mr-2" />
           添加用户
         </Button>
+      </div>
+
+      {/* 用户统计 */}
+      <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <div className="rounded-lg border bg-card p-4">
+          <div className="text-2xl font-bold">{totalUsers}</div>
+          <p className="text-sm text-muted-foreground">总用户数</p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className="text-2xl font-bold text-green-600">{activeUsers}</div>
+          <p className="text-sm text-muted-foreground">活跃用户</p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className="text-2xl font-bold text-red-600">{disabledUsers}</div>
+          <p className="text-sm text-muted-foreground">禁用用户</p>
+        </div>
+        <div className="rounded-lg border bg-card p-4">
+          <div className="text-2xl font-bold text-blue-600">{newUsersThisMonth}</div>
+          <p className="text-sm text-muted-foreground">本月新增</p>
+        </div>
       </div>
 
       {/* 搜索表单 */}
@@ -405,8 +184,23 @@ export default function UsersPage() {
 
       {/* 数据表格 */}
       <div className="bg-white rounded-lg border shadow-sm">
-        <DataTable columns={columns} data={filteredUsers} />
+        <DataTable 
+          columns={columns} 
+          data={filteredUsers} 
+          action={{
+            onEdit: handleEditUser
+          }}
+        />
       </div>
+
+      {/* 用户表单弹窗 */}
+      <UserFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleUserFormSuccess}
+        user={editingUser}
+        mode={dialogMode}
+      />
     </div>
   );
 }
