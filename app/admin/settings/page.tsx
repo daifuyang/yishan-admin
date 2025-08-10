@@ -121,7 +121,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="py-6 space-y-6">
       {/* 系统基础信息 */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>

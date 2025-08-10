@@ -47,8 +47,8 @@ const data = {
           url: "/admin/dashboard/monitor",
         },
         {
-          title: "活动日志",
-          url: "/admin/dashboard/logs",
+          title: "实时告警",
+          url: "/admin/dashboard/alerts",
         },
       ],
     },
@@ -66,12 +66,8 @@ const data = {
           url: "/admin/users/create",
         },
         {
-          title: "用户导入",
-          url: "/admin/users/import",
-        },
-        {
-          title: "用户导出",
-          url: "/admin/users/export",
+          title: "批量管理",
+          url: "/admin/users/batch",
         },
       ],
     },
@@ -89,7 +85,7 @@ const data = {
           url: "/admin/roles/create",
         },
         {
-          title: "权限管理",
+          title: "权限配置",
           url: "/admin/roles/permissions",
         },
         {
@@ -116,7 +112,7 @@ const data = {
           url: "/admin/departments/structure",
         },
         {
-          title: "人员管理",
+          title: "人员调配",
           url: "/admin/departments/personnel",
         },
       ],
@@ -127,11 +123,11 @@ const data = {
       icon: Settings,
       items: [
         {
-          title: "基础设置",
+          title: "基础配置",
           url: "/admin/settings/basic",
         },
         {
-          title: "参数配置",
+          title: "参数管理",
           url: "/admin/settings/parameters",
         },
         {

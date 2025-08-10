@@ -164,6 +164,58 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // 在服务端渲染期间，显示桌面版本以避免水合不匹配
+  if (!mounted) {
+    return (
+      <div
+        className="group peer text-sidebar-foreground hidden md:block"
+        data-state={state}
+        data-collapsible={state === "collapsed" ? collapsible : ""}
+        data-variant={variant}
+        data-side={side}
+        data-slot="sidebar"
+      >
+        <div
+          data-slot="sidebar-gap"
+          className={cn(
+            "bg-transparent transition-[width] duration-200 ease-linear",
+            "group-data-[side=left]:w-(--sidebar-width)",
+            "group-data-[side=right]:w-(--sidebar-width)",
+            "group-data-[collapsible=offcanvas]:w-0",
+            "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
+          )}
+        />
+        <div
+          className={cn(
+            "bg-sidebar text-sidebar-foreground fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+            side === "left" &&
+              "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]",
+            side === "right" &&
+              "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
+            "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
+            className
+          )}
+          style={
+            {
+              "--sidebar-width": SIDEBAR_WIDTH,
+              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+            } as React.CSSProperties
+          }
+          {...props}
+        >
+          <div data-sidebar="sidebar" className="flex h-full w-full flex-col">
+            {children}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (collapsible === "none") {
     return (

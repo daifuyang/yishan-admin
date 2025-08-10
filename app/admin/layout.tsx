@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -33,10 +33,24 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
+  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   // 如果是登录页面，不使用sidebar布局
   if (pathname === "/admin/login") {
     return <>{children}</>
+  }
+  
+  // 在服务端渲染期间显示loading状态
+  if (!mounted) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    )
   }
   
   // 获取当前页面的标题
@@ -74,15 +88,14 @@ export default function AdminLayout({
   }
   
   const breadcrumbs = generateBreadcrumbs()
-  const currentPageTitle = getPageTitle(pathname)
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+        <header className="flex py-4 px-8 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:pt-2 group-has-data-[collapsible=icon]/sidebar-wrapper:px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
             <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"
@@ -91,7 +104,7 @@ export default function AdminLayout({
               <BreadcrumbList>
                 {breadcrumbs.map((breadcrumb, index) => (
                   <React.Fragment key={breadcrumb.href}>
-                    <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbItem>
                       {breadcrumb.isCurrent ? (
                         <BreadcrumbPage>{breadcrumb.title}</BreadcrumbPage>
                       ) : (
@@ -101,7 +114,7 @@ export default function AdminLayout({
                       )}
                     </BreadcrumbItem>
                     {!breadcrumb.isCurrent && index < breadcrumbs.length - 1 && (
-                      <BreadcrumbSeparator className="hidden md:block" />
+                      <BreadcrumbSeparator />
                     )}
                   </React.Fragment>
                 ))}
@@ -109,10 +122,7 @@ export default function AdminLayout({
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold tracking-tight">{currentPageTitle}</h1>
-          </div>
+        <div className="flex flex-1 flex-col px-8 group-has-data-[collapsible=icon]/sidebar-wrapper:px-4">
           {children}
         </div>
       </SidebarInset>

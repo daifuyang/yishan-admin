@@ -101,7 +101,7 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="py-6 space-y-6">
       {/* 页面操作栏 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
