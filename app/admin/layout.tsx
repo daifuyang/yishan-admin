@@ -24,6 +24,7 @@ const breadcrumbMap: Record<string, string> = {
   "/admin/users": "用户管理",
   "/admin/roles": "角色管理",
   "/admin/departments": "部门管理",
+  "/admin/positions": "岗位管理",
   "/admin/settings": "系统设置",
 }
 

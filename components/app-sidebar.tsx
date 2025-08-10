@@ -8,6 +8,7 @@ import {
   Settings,
   LayoutDashboard,
   GalleryVerticalEnd,
+  Briefcase,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -114,6 +115,29 @@ const data = {
         {
           title: "人员调配",
           url: "/admin/departments/personnel",
+        },
+      ],
+    },
+    {
+      title: "岗位管理",
+      url: "/admin/positions",
+      icon: Briefcase,
+      items: [
+        {
+          title: "岗位列表",
+          url: "/admin/positions",
+        },
+        {
+          title: "岗位新增",
+          url: "/admin/positions/create",
+        },
+        {
+          title: "岗位配置",
+          url: "/admin/positions/config",
+        },
+        {
+          title: "人员分配",
+          url: "/admin/positions/assign",
         },
       ],
     },
