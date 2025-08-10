@@ -100,9 +100,9 @@ export const columns: ProColumnDef<Role>[] = [
     filters: true,
     render: (text: any) => {
       return text === "正常" ? (
-        <Badge className="bg-green-100 text-green-800">正常</Badge>
+        <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100">正常</Badge>
       ) : (
-        <Badge className="bg-red-100 text-red-800">禁用</Badge>
+        <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-100">禁用</Badge>
       );
     },
   },

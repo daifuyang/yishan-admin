@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import { columns, type Role, type ProColumnDef } from "./columns";
 import { DataTable } from "./data-table";
@@ -123,11 +124,14 @@ export default function RolesPage() {
   const totalUsers = roles.reduce((sum, role) => sum + role.userCount, 0);
 
   return (
-    <div className="pb-6">
+    <div className="space-y-4">
       {/* 页面标题区域 */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">角色管理</h1>
-        <Button className="h-9 px-4" onClick={() => {
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">角色管理</h1>
+          <p className="text-muted-foreground">管理系统角色和权限配置</p>
+        </div>
+        <Button onClick={() => {
           setDialogMode('add');
           setEditingRole(undefined);
           setDialogOpen(true);
@@ -138,27 +142,35 @@ export default function RolesPage() {
       </div>
 
       {/* 角色统计 */}
-      <div className="grid gap-4 md:grid-cols-4 mb-6">
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold">{totalRoles}</div>
-          <p className="text-sm text-muted-foreground">总角色数</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold text-green-600">{activeRoles}</div>
-          <p className="text-sm text-muted-foreground">正常角色</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold text-red-600">{disabledRoles}</div>
-          <p className="text-sm text-muted-foreground">禁用角色</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold text-blue-600">{totalUsers}</div>
-          <p className="text-sm text-muted-foreground">关联用户</p>
-        </div>
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold">{totalRoles}</div>
+            <p className="text-sm text-muted-foreground">总角色数</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-green-600">{activeRoles}</div>
+            <p className="text-sm text-muted-foreground">正常角色</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-red-600">{disabledRoles}</div>
+            <p className="text-sm text-muted-foreground">禁用角色</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-blue-600">{totalUsers}</div>
+            <p className="text-sm text-muted-foreground">关联用户</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* 搜索表单 */}
-      <div className="mb-6">
+      <div>
         <TableSearchForm
           columns={columns}
           onSearch={setSearchParams}
@@ -174,7 +186,7 @@ export default function RolesPage() {
       </div>
 
       {/* 数据表格 */}
-      <div className="bg-white rounded-lg border shadow-sm">
+      <Card className="p-0 overflow-hidden">
         <DataTable 
           columns={columns} 
           data={filteredRoles} 
@@ -182,7 +194,7 @@ export default function RolesPage() {
             onEdit: handleEditRole
           }}
         />
-      </div>
+      </Card>
 
       {/* 角色表单弹窗 */}
       <RoleFormDialog

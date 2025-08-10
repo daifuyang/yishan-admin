@@ -152,7 +152,7 @@ export default function UsersPage() {
 
       {/* 用户统计 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="py-0">
+        <Card className="p-0">
           <CardContent className="p-6">
             <div className="text-2xl font-bold">{totalUsers}</div>
             <p className="text-sm text-muted-foreground">总用户数</p>
