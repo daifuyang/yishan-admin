@@ -1,236 +1,252 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Search, MoreHorizontal, Building, UserPlus, Edit, Trash2, Users } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Plus } from "lucide-react";
+import { columns, type Department, type ProColumnDef } from "./columns";
+import { DataTable } from "./data-table";
+import TableSearchForm, { ProColumnType } from "@/components/ui/table-search-form";
+import { DepartmentFormDialog } from "./department-form-dialog";
 
 export default function DepartmentsPage() {
-  // 模拟部门数据
-  const departments = [
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchParams, setSearchParams] = useState<Record<string, any>>({});
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingDepartment, setEditingDepartment] = useState<Department | undefined>(undefined);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+  const [parentDepartment, setParentDepartment] = useState<Department | undefined>();
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  // 根据搜索参数过滤部门
+  const filteredDepartments = departments.filter((department) => {
+    return Object.entries(searchParams).every(([key, value]) => {
+      if (!value) return true;
+      const departmentValue = department[key as keyof Department];
+      if (typeof departmentValue === 'string') {
+        return departmentValue.toLowerCase().includes(value.toLowerCase());
+      }
+      return departmentValue === value;
+    });
+  });
+
+  const fetchDepartments = async () => {
+    setLoading(true);
+    try {
+      const mockDepartments: Department[] = [
     {
-      id: 1,
+      id: "1",
       name: "技术部",
-      code: "tech",
-      parent: "总公司",
+      code: "TECH",
+      parent: "-",
       leader: "张三",
+      userCount: 25,
+      status: "正常",
+      description: "负责公司技术研发工作",
+      createTime: "2024-01-15 10:30:00",
+    },
+    {
+      id: "2",
+      name: "产品部",
+      code: "PROD",
+      parent: "-",
+      leader: "李四",
+      userCount: 12,
+      status: "正常",
+      description: "负责产品设计和规划",
+      createTime: "2024-01-16 14:20:00",
+    },
+    {
+      id: "3",
+      name: "市场部",
+      code: "MKT",
+      parent: "-",
+      leader: "王五",
+      userCount: 18,
+      status: "正常",
+      description: "负责市场推广和销售",
+      createTime: "2024-01-17 09:15:00",
+    },
+    {
+      id: "4",
+      name: "人事部",
+      code: "HR",
+      parent: "-",
+      leader: "赵六",
       userCount: 8,
       status: "正常",
-      description: "负责技术开发和系统维护",
-      createTime: "2024-01-01 10:00:00",
+      description: "负责人力资源管理",
+      createTime: "2024-01-18 11:45:00",
     },
     {
-      id: 2,
-      name: "市场部",
-      code: "market",
-      parent: "总公司",
-      leader: "李四",
-      userCount: 5,
-      status: "正常",
-      description: "负责市场营销和客户拓展",
-      createTime: "2024-01-01 10:00:00",
-    },
-    {
-      id: 3,
+      id: "5",
       name: "财务部",
-      code: "finance",
-      parent: "总公司",
-      leader: "王五",
-      userCount: 3,
-      status: "正常",
-      description: "负责财务管理和会计核算",
-      createTime: "2024-01-15 14:30:00",
+      code: "FIN",
+      parent: "-",
+      leader: "钱七",
+      userCount: 6,
+      status: "禁用",
+      description: "负责财务管理和会计工作",
+      createTime: "2024-01-19 16:30:00",
     },
-    {
-      id: 4,
-      name: "人事部",
-      code: "hr",
-      parent: "总公司",
-      leader: "赵六",
-      userCount: 4,
-      status: "正常",
-      description: "负责人力资源管理和行政事务",
-      createTime: "2024-02-01 09:15:00",
-    },
-    {
-      id: 5,
-      name: "前端组",
-      code: "frontend",
-      parent: "技术部",
-      leader: "前端经理",
-      userCount: 3,
-      status: "正常",
-      description: "负责前端开发工作",
-      createTime: "2024-02-15 16:45:00",
-    },
-    {
-      id: 6,
-      name: "后端组",
-      code: "backend",
-      parent: "技术部",
-      leader: "后端经理",
-      userCount: 4,
-      status: "正常",
-      description: "负责后端开发工作",
-      createTime: "2024-02-15 16:45:00",
-    },
-  ]
+    ];
 
-  const getStatusBadge = (status: string) => {
-    return status === "正常" ? (
-      <Badge className="bg-green-100 text-green-800">正常</Badge>
-    ) : (
-      <Badge className="bg-red-100 text-red-800">禁用</Badge>
-    )
-  }
+      setDepartments(mockDepartments);
+    } catch (error) {
+      console.error("获取部门列表失败:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDepartmentFormSuccess = (departmentData: Department, isEdit?: boolean) => {
+    if (isEdit) {
+      // 编辑模式：更新现有部门
+      setDepartments(prevDepartments => 
+        prevDepartments.map(department => 
+          department.id === departmentData.id ? departmentData : department
+        )
+      );
+    } else {
+      // 添加模式：添加新部门
+      setDepartments(prevDepartments => [departmentData, ...prevDepartments]);
+    }
+  };
+
+  const handleEditDepartment = (department: Department) => {
+    setEditingDepartment(department);
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleAddSubDepartment = (department: Department) => {
+    setParentDepartment(department);
+    setDialogMode('add');
+    setEditingDepartment(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteDepartment = (department: Department) => {
+    if (confirm(`确定要删除部门 "${department.name}" 吗？`)) {
+      setDepartments(prev => prev.filter(d => d.id !== department.id));
+    }
+  };
+
+  const handleToggleStatus = (department: Department) => {
+    const newStatus = department.status === "正常" ? "禁用" : "正常";
+    const updatedDepartment = { ...department, status: newStatus };
+    setDepartments(prev => prev.map(d => d.id === department.id ? updatedDepartment : d));
+  };
+
+  const handleViewDepartment = (department: Department) => {
+    alert(`查看部门详情: ${department.name}`);
+  };
+
+  const handleViewUsers = (department: Department) => {
+    alert(`查看部门人员: ${department.name}`);
+  };
+
+  // 计算统计数据
+  const totalDepartments = departments.length;
+  const activeDepartments = departments.filter(d => d.status === "正常").length;
+  const disabledDepartments = departments.filter(d => d.status === "禁用").length;
+  const totalUsers = departments.reduce((sum, d) => sum + d.userCount, 0);
 
   return (
-    <div className="py-6 space-y-6">
-      {/* 页面操作栏 */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="搜索部门名称/编码"
-              className="pl-10 w-full sm:w-[300px]"
-            />
-          </div>
+    <div className="space-y-4">
+      {/* 页面标题区域 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">部门管理</h1>
+          <p className="text-muted-foreground">管理组织架构和部门信息</p>
         </div>
-        <Button>
-          <Building className="mr-2 h-4 w-4" />
-          新增部门
-        </Button>
+        <div className="flex justify-end">
+          <Button onClick={() => {
+            setDialogMode('add');
+            setEditingDepartment(undefined);
+            setParentDepartment(undefined);
+            setDialogOpen(true);
+          }}>
+            <Plus className="w-4 h-4 mr-2" />
+            添加部门
+          </Button>
+        </div>
       </div>
 
       {/* 部门统计 */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold">{departments.length}</div>
-          <p className="text-sm text-muted-foreground">部门总数</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold text-green-600">
-            {departments.filter(d => d.status === "正常").length}
-          </div>
-          <p className="text-sm text-muted-foreground">正常部门</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold text-red-600">
-            {departments.filter(d => d.status === "禁用").length}
-          </div>
-          <p className="text-sm text-muted-foreground">禁用部门</p>
-        </div>
-        <div className="rounded-lg border bg-card p-4">
-          <div className="text-2xl font-bold">
-            {departments.reduce((sum, dept) => sum + dept.userCount, 0)}
-          </div>
-          <p className="text-sm text-muted-foreground">部门人员</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold">{totalDepartments}</div>
+            <p className="text-sm text-muted-foreground">总部门数</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-green-600">{activeDepartments}</div>
+            <p className="text-sm text-muted-foreground">正常部门</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-red-600">{disabledDepartments}</div>
+            <p className="text-sm text-muted-foreground">禁用部门</p>
+          </CardContent>
+        </Card>
+        <Card className="p-0">
+          <CardContent className="p-6">
+            <div className="text-2xl font-bold text-blue-600">{totalUsers}</div>
+            <p className="text-sm text-muted-foreground">总人员数</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* 部门表格 */}
-      <div className="rounded-lg border bg-card">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold">部门列表</h3>
-        </div>
-        <div className="p-6 pt-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>部门名称</TableHead>
-                <TableHead>部门编码</TableHead>
-                <TableHead>上级部门</TableHead>
-                <TableHead>负责人</TableHead>
-                <TableHead>人员数量</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>描述</TableHead>
-                <TableHead>创建时间</TableHead>
-                <TableHead className="w-[100px]">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {departments.map((dept) => (
-                <TableRow key={dept.id}>
-                  <TableCell className="font-medium">{dept.name}</TableCell>
-                  <TableCell className="font-mono text-sm">{dept.code}</TableCell>
-                  <TableCell>{dept.parent}</TableCell>
-                  <TableCell>{dept.leader}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-gray-400" />
-                      {dept.userCount}
-                    </div>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(dept.status)}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{dept.description}</TableCell>
-                  <TableCell>{dept.createTime}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>操作</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Edit className="mr-2 h-4 w-4" />
-                          编辑
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <UserPlus className="mr-2 h-4 w-4" />
-                          添加下级部门
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Users className="mr-2 h-4 w-4" />
-                          查看人员
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          删除
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+      {/* 搜索表单 */}
+      <div>
+        <TableSearchForm
+          columns={columns}
+          onSearch={setSearchParams}
+          onReset={() => setSearchParams({})}
+          defaultCollapsed={true}
+          layout="horizontal"
+          labelWidth={80}
+          hideRequiredMark={true}
+          split={false}
+          preserve={true}
+          className=""
+        />
       </div>
 
-      {/* 分页 */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          显示 1 到 {departments.length} 条，共 {departments.length} 条记录
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            上一页
-          </Button>
-          <Button variant="outline" size="sm" disabled>
-            下一页
-          </Button>
-        </div>
-      </div>
+      {/* 数据表格 */}
+      <Card className="p-0 overflow-hidden">
+        <DataTable 
+          columns={columns} 
+          data={filteredDepartments} 
+          action={{
+            onView: handleViewDepartment,
+            onEdit: handleEditDepartment,
+            onDelete: handleDeleteDepartment,
+            onAddSubDepartment: handleAddSubDepartment,
+            onViewUsers: handleViewUsers,
+            onDisable: (department: Department) => handleToggleStatus(department),
+            onEnable: (department: Department) => handleToggleStatus(department),
+          }}
+        />
+      </Card>
+
+      {/* 部门表单弹窗 */}
+      <DepartmentFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleDepartmentFormSuccess}
+        department={editingDepartment}
+        mode={dialogMode}
+        parentDepartment={parentDepartment}
+      />
     </div>
-  )
+  );
 }
