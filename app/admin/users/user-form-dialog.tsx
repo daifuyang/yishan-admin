@@ -271,7 +271,7 @@ export function UserFormDialog({
               )}
             />
             
-            <DialogFooter className="flex justify-end space-x-2 pt-6">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"

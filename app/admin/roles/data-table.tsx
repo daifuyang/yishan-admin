@@ -98,7 +98,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 px-6 py-4 border-t bg-gray-50/50">
+      <div className="flex items-center justify-end space-x-2 px-4 py-3 border-t">
         <DataTablePagination table={table} />
       </div>
     </div>

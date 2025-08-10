@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,6 +103,23 @@ export const columns: ProColumnDef<User>[] = [
       user: { text: "普通用户", status: "Default" },
       editor: { text: "编辑", status: "Success" },
     },
+    render: (text: any, record: User) => {
+      const getRoleStyle = (role: string) => {
+        switch (role) {
+          case "管理员":
+            return "text-blue-700 bg-blue-50 border-blue-200";
+          case "编辑":
+            return "text-purple-700 bg-purple-50 border-purple-200";
+          default:
+            return "text-gray-700 bg-gray-50 border-gray-200";
+        }
+      };
+      return (
+        <Badge variant="outline" className={getRoleStyle(record.role)}>
+          {record.role}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "status",
@@ -112,6 +130,15 @@ export const columns: ProColumnDef<User>[] = [
       inactive: { text: "禁用", status: "Default" },
     },
     filters: true,
+    render: (text: any, record: User) => {
+      const variant = record.status === "正常" ? "default" : "secondary";
+      const color = record.status === "正常" ? "text-green-700 bg-green-50 border-green-200" : "text-gray-700 bg-gray-50 border-gray-200";
+      return (
+        <Badge variant={variant} className={color}>
+          {record.status}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "email",
